@@ -1,4 +1,4 @@
-# Exercício - Podcast Player
+﻿# Exercício - Podcast Player
 
 Esta tarefa envolve os conceitos de UI widgets, Threads, Services, Custom Adapters, 
 Intents, Permissions, SharedPreferences, SQLite, Broadcast Receivers. 
@@ -43,7 +43,7 @@ episódio, atualizações em segundo plano, notificações de novos episódios, 
 
 | Passo | Completou? |
 | ------ | ------ |
-| 1 | **não** |
+| 1 | **sim** |
 | 2 | **não** |
 | 3 | **não** |
 | 4 | **não** |

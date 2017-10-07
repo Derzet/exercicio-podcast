@@ -1,9 +1,13 @@
 package br.ufpe.cin.if710.podcast.ui;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,29 +20,32 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.ufpe.cin.if710.podcast.R;
+import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
 import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
+
 
 public class MainActivity extends Activity {
 
     //ao fazer envio da resolucao, use este link no seu codigo!
     private final String RSS_FEED = "http://leopoldomt.com/if710/fronteirasdaciencia.xml";
+    private ContentResolver cr ; //adicionado o content
     //TODO teste com outros links de podcast
-
     private ListView items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        cr = getContentResolver(); //instancia para a activity
         items = (ListView) findViewById(R.id.items);
     }
 
@@ -87,10 +94,25 @@ public class MainActivity extends Activity {
             List<ItemFeed> itemList = new ArrayList<>();
             try {
                 itemList = XmlFeedParser.parse(getRssFeed(params[0]));
+                for (ItemFeed item : itemList) {
+                    ContentValues content = new ContentValues();
+                    content.put(PodcastProviderContract.TITLE, item.getTitle());
+                    content.put(PodcastProviderContract.DATE, item.getPubDate());
+                    content.put(PodcastProviderContract.LINK, "nao tem link"); //revisar o parser
+                    content.put(PodcastProviderContract.DESCRIPTION, item.getDescription());
+                    content.put(PodcastProviderContract.DOWNLOAD_LINK, item.getDownloadLink());
+                    content.put(PodcastProviderContract.URI, "");
+                     // Log.d("Main Activity", "Item inserido");
+                        getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI,content);
+                        //  Log.d("Main Activity", "insert funcinando")
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
+            } catch(IllegalArgumentException e) {
+                //  Log.d("Main Activity", "ERROR");
+                Toast.makeText(getApplicationContext(), "URI Inválida", Toast.LENGTH_SHORT).show();
             }
             return itemList;
         }
@@ -99,25 +121,57 @@ public class MainActivity extends Activity {
         protected void onPostExecute(List<ItemFeed> feed) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
 
-            //Adapter Personalizado
-            XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, feed);
+            //Cursor
+
+            Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,
+                    PodcastProviderContract.ALL_COLUMNS,
+                    null,
+                    null,
+                    null);
+            List<ItemFeed> mArrayList = new ArrayList<ItemFeed>();
+            if (c.moveToFirst()){
+                do{
+                    String title = c.getString(c.getColumnIndex("title"));
+                    String pubDate = c.getString(c.getColumnIndex("pubDate"));
+                    String description = c.getString(c.getColumnIndex("description"));
+                    String link = c.getString(c.getColumnIndex("link"));
+                    String downloadLink = c.getString(c.getColumnIndex("downloadLink"));
+
+                    mArrayList.add(new ItemFeed(title,link,pubDate,description,downloadLink));
+                    // do what ever you want here
+                }while(c.moveToNext());
+            }
+            c.close();
+
+
+            //dapter Personalizado
+            XmlFeedAdapter adapter = new XmlFeedAdapter(getApplicationContext(), R.layout.itemlista, mArrayList);
 
             //atualizar o list view
             items.setAdapter(adapter);
             items.setTextFilterEnabled(true);
-            /*
+
+
+            //ação quando clicando no listener
             items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                   // final TextView title_id = (TextView) view.findViewById(R.id.item_title);
                     XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
                     ItemFeed item = adapter.getItem(position);
-                    String msg = item.getTitle() + " " + item.getLink();
+                    String msg = item.getTitle() + " " + "Link:"+ item.getDownloadLink();
                     Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+
+                    Intent i = new Intent(getApplicationContext(),EpisodeDetailActivity.class);
+                    i.putExtra("itemFeed", item);
+                    startActivity(i);
+
                 }
             });
-            /**/
+
         }
     }
+
 
     //TODO Opcional - pesquise outros meios de obter arquivos da internet
     private String getRssFeed(String feed) throws IOException {
@@ -141,4 +195,11 @@ public class MainActivity extends Activity {
         }
         return rssFeed;
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
 }

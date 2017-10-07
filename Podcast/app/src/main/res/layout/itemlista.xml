@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants">    <!-- que negócio chato -->
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,7 +14,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="8"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textColor="@android:color/black"/>
         <Button
             android:id="@+id/item_action"
             android:layout_width="wrap_content"
@@ -27,6 +29,7 @@
         android:id="@+id/item_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        android:textColor="@android:color/black"/>
 
 </LinearLayout>

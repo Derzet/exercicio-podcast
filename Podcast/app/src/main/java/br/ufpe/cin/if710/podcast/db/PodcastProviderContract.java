@@ -8,7 +8,7 @@ import android.net.Uri;
  */
 
 public class PodcastProviderContract {
-
+   //CORRIGINDO O MAPEANDO DE PROVIDERCONTRACT PARA O PODCASTDBHELPER
     public static final String _ID = "_id";
     public static final String TITLE = "title";
     public static final String DATE = "pubDate";

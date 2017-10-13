@@ -16,6 +16,7 @@ public class EpisodeDetailActivity extends Activity {
         setContentView(R.layout.activity_episode_detail);
         Intent i = getIntent();
         ItemFeed item = (ItemFeed)i.getSerializableExtra("itemFeed");
+        //MAPEANDO AS CLASSES PARA OS RESPECTIVOS TEXTVIEW
          ((TextView)findViewById(R.id.title)).setText(item.getTitle());
          ((TextView)findViewById(R.id.link)).setText(item.getLink());
          ((TextView) findViewById(R.id.pubDate)).setText(item.getPubDate());

@@ -7,6 +7,7 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class PodcastProvider extends ContentProvider {
@@ -50,8 +51,8 @@ public class PodcastProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        // TODO: Implement this to handle query requests from clients.
-        // Use SQLiteQueryBuilder for querying db
+
+        // Usando SQLiteQueryBuilder para criar uma seleção
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
         queryBuilder.setTables(PodcastProviderContract.EPISODE_TABLE);
         Cursor cursor;
@@ -77,7 +78,25 @@ public class PodcastProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        // TODO: Implement this to handle requests to update one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+          int count = 0;
+
+        if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)){
+            count = database.update(
+                    "episodes",
+                    values,
+                      PodcastProviderContract._ID
+                              +" = "
+                              + selection,
+                    selectionArgs
+
+            );
+
+        }else{
+            throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return count;
     }
 }

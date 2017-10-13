@@ -27,6 +27,10 @@
             android:exported="true" />
 
         <activity android:name=".ui.EpisodeDetailActivity"></activity>
+        <service android:enabled="true" android:name=".services.PodcastIntentService" />
+
+
+
     </application>
 
 </manifest>

@@ -1,17 +1,24 @@
 package br.ufpe.cin.if710.podcast.ui;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,11 +42,35 @@ import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
 
 public class MainActivity extends Activity {
 
+
     //ao fazer envio da resolucao, use este link no seu codigo!
     private final String RSS_FEED = "http://leopoldomt.com/if710/fronteirasdaciencia.xml";
     private ContentResolver cr ; //adicionado o content
     //TODO teste com outros links de podcast
     private ListView items;
+    private final String ACTION_NOTIFICATION = "br.ufpe.cin.if710.podcast.action.NOTIFICATION";
+    //conectando meu broadcastRecieber
+    //private PodcastBroadCastReciever receiver;
+    BroadcastReceiver receiver =  new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ACTION_NOTIFICATION)) {
+                Log.d("Broadcast", "IntentBroadCast");
+                Toast.makeText(context,"Download Acabou!", Toast.LENGTH_SHORT).show();
+                int position = Integer.parseInt(intent.getStringExtra("position"));
+                String state = intent.getStringExtra("state");
+
+                Button button  = items.getChildAt(position-1).findViewById(R.id.item_action);
+                button.setText(state);
+                // Log.d("Broadcast", "IntentBroadCast");
+                //context.getClass().items.
+
+            }
+
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +78,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         cr = getContentResolver(); //instancia para a activity
         items = (ListView) findViewById(R.id.items);
+
     }
 
     @Override
@@ -73,6 +105,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        IntentFilter filter = new IntentFilter(ACTION_NOTIFICATION);
+        //filter.addCategory(Intent.CATEGORY_DEFAULT);
+        registerReceiver(receiver,filter );
         new DownloadXmlTask().execute(RSS_FEED);
     }
 
@@ -81,6 +116,8 @@ public class MainActivity extends Activity {
         super.onStop();
         XmlFeedAdapter adapter = (XmlFeedAdapter) items.getAdapter();
         adapter.clear();
+        unregisterReceiver(receiver);
+
     }
 
     private class DownloadXmlTask extends AsyncTask<String, Void, List<ItemFeed>> {
@@ -98,7 +135,7 @@ public class MainActivity extends Activity {
                     ContentValues content = new ContentValues();
                     content.put(PodcastProviderContract.TITLE, item.getTitle());
                     content.put(PodcastProviderContract.DATE, item.getPubDate());
-                    content.put(PodcastProviderContract.LINK, "nao tem link"); //revisar o parser
+                    content.put(PodcastProviderContract.LINK, item.getLink()); //revisar o parser
                     content.put(PodcastProviderContract.DESCRIPTION, item.getDescription());
                     content.put(PodcastProviderContract.DOWNLOAD_LINK, item.getDownloadLink());
                     content.put(PodcastProviderContract.URI, "");
@@ -120,9 +157,7 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(List<ItemFeed> feed) {
             Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
-
             //Cursor
-
             Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,
                     PodcastProviderContract.ALL_COLUMNS,
                     null,
@@ -152,6 +187,7 @@ public class MainActivity extends Activity {
             items.setTextFilterEnabled(true);
 
 
+/*
             //ação quando clicando no listener
             items.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -160,21 +196,23 @@ public class MainActivity extends Activity {
                     XmlFeedAdapter adapter = (XmlFeedAdapter) parent.getAdapter();
                     ItemFeed item = adapter.getItem(position);
                     String msg = item.getTitle() + " " + "Link:"+ item.getDownloadLink();
-                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 
                     Intent i = new Intent(getApplicationContext(),EpisodeDetailActivity.class);
                     i.putExtra("itemFeed", item);
                     startActivity(i);
 
                 }
-            });
 
+
+            });
+*/
         }
     }
 
 
     //TODO Opcional - pesquise outros meios de obter arquivos da internet
-    private String getRssFeed(String feed) throws IOException {
+    public String getRssFeed(String feed) throws IOException {
         InputStream in = null;
         String rssFeed = "";
         try {

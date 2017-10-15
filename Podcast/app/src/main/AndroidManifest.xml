@@ -28,7 +28,7 @@
 
         <activity android:name=".ui.EpisodeDetailActivity"></activity>
         <service android:enabled="true" android:name=".services.PodcastIntentService" />
-
+        <service android:enabled="true" android:name=".services.PodcastService" />
 
 
     </application>

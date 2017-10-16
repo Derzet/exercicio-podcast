@@ -106,9 +106,8 @@ public class PodcastIntentService extends IntentService {
                     idN + "",
                     null
             );
+
             Log.d("PodcastIntentService", "FinishUpdate");
-
-
             //iniciando uma intent para o broadcast
             Intent broadcastIntent = new Intent();
             broadcastIntent.setAction("br.ufpe.cin.if710.podcast.action.NOTIFICATION");

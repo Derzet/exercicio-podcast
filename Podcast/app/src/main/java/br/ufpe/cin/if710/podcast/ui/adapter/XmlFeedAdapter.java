@@ -2,28 +2,20 @@ package br.ufpe.cin.if710.podcast.ui.adapter;
 
 import java.io.IOException;
 import java.util.List;
-
-import android.app.Activity;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.media.MediaPlayer;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-
 import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.services.PodcastIntentService;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
-import br.ufpe.cin.if710.podcast.services.PodcastService;
 import br.ufpe.cin.if710.podcast.ui.EpisodeDetailActivity;
 import br.ufpe.cin.if710.podcast.ui.MainActivity;
 
@@ -40,9 +32,6 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         super(context, resource, objects);
         contextA = context;
         linkResource = resource;
-
-
-
     }
 
     public void setMainActivity(MainActivity callback){
@@ -99,7 +88,6 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         holder.item_title.setText(getItem(position).getTitle());
         holder.item_date.setText(getItem(position).getPubDate());
         holder.position =  position;
-        //Fazer condicao para verificar se o item foi baixado ja
         ContentResolver cr = contextA.getContentResolver();
         if(!holder.download.getText().equals("")){
             Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
@@ -139,33 +127,19 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                 if (estado.equalsIgnoreCase("BAIXAR")) {
                     serviceI.putExtra("itemFeed", getItem(holder.position));
                     serviceI.putExtra("position",((Integer)(holder.position)).toString());
-                    Intent download = serviceI.setAction("DOWNLOAD");
+                   serviceI.setAction("DOWNLOAD");
                      contextA.startService(serviceI);
                 }else if(estado.equalsIgnoreCase("PLAY")){
-                    //serviceI.putExtra("position",((Integer)(holder.position+1)).toString());
-                   // serviceI.setAction("PLAY");
-                   // MainActivity x = (MainActivity) contextA;
                   if(mainActivity instanceof  MainActivity){
                       try {
-                         // mainActivity.getPodcastService().
                           mainActivity.getPodcastService().playPodcast((holder.position));
                       } catch (IOException e) {
                           e.printStackTrace();
                       }
-                  }else{
-                      Log.e("VOU DORMIR","VOU DORMIR");
                   }
 
-
-                    //contextA.bindService();
-                    //contextA.startService(serviceI);
                 }else if(estado.equalsIgnoreCase("PAUSE")){
                     mainActivity.getPodcastService().pausePodcast((holder.position));
-                    //serviceI.setAction("PAUSE");
-                   // contextA.startService(serviceI);
-
-                }else{
-                     holder.download.setText("No compriendo");
                 }
             }
         });

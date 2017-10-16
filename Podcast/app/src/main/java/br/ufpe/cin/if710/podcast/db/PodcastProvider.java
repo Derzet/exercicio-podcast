@@ -37,6 +37,7 @@ public class PodcastProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        //INSERIR DADOS VERIFICANDO ID EXISTENTE
         if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)) {
             long rowId = database.insertOrThrow(PodcastProviderContract.EPISODE_TABLE, null, values);
             return Uri.withAppendedPath(PodcastProviderContract.EPISODE_LIST_URI, Long.toString(rowId));

@@ -149,6 +149,7 @@ public class MainActivity extends Activity {
         XmlFeedAdapter adapter = (XmlFeedAdapter) items.getAdapter();
         adapter.clear();
         unregisterReceiver(receiver);
+
         showNotification();
 
 

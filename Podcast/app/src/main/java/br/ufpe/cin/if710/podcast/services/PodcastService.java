@@ -2,6 +2,7 @@ package br.ufpe.cin.if710.podcast.services;
 
 import android.app.Service;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
@@ -32,7 +33,7 @@ public class PodcastService extends Service {
 
     //database
     private ContentResolver cr ;
-    private List<ManagerMediaPlayer> managerMediaPlayers;
+    private List<ManagerMediaPlayer> managerMediaPlayers; //gerenciador de mediaplayer
 
 
     /**
@@ -51,7 +52,6 @@ public class PodcastService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.e("PodcastIntentService","Entrou");
-       // String id =  intent.getStringExtra("position");
 
         return mBinder;
     }
@@ -79,7 +79,7 @@ public class PodcastService extends Service {
                 int time = item.getTime();
                 item.getmPlayer().seekTo(time);
                 item.getmPlayer().start();
-                Log.e("PODCASTSERVICE","MUSICA JA EXISTIA");
+              //  Log.e("PODCASTSERVICE","MUSICA JA EXISTIA");
                 break;
             }
         }
@@ -97,7 +97,7 @@ public class PodcastService extends Service {
 
             //inicializando o mediaplayer
             MediaPlayer mPlayer;
-            mPlayer = new MediaPlayer();       //26
+            mPlayer = new MediaPlayer();
             mPlayer.reset();
 
             mPlayer.setDataSource(downloadURI);
@@ -111,10 +111,8 @@ public class PodcastService extends Service {
                     break;
                 }
             }
-
-
-
         }
+
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("br.ufpe.cin.if710.podcast.action.NOTIFICATION");
@@ -133,7 +131,6 @@ public class PodcastService extends Service {
                 break;
             }
         }
-
 
         //mando alterar
         Intent broadcastIntent = new Intent();

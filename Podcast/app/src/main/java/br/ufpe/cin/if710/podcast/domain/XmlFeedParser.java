@@ -117,7 +117,7 @@ public class XmlFeedParser {
         parser.require(XmlPullParser.START_TAG,null, "enclosure");
         String data = parser.getAttributeValue(null, "url");
        // parser.require(XmlPullParser.END_TAG, null, "enclosure");
-        //não pdoe chamar o fim da tag , porque a Tag não é fechada.
+        //não pode chamar o fim da tag , porque a Tag não é fechada.
         return data;
     }
 

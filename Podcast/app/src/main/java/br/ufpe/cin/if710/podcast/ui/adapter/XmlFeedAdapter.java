@@ -5,9 +5,11 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.util.Log;
@@ -18,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import br.ufpe.cin.if710.podcast.R;
+import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.services.PodcastIntentService;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.services.PodcastService;
@@ -97,12 +100,20 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         holder.item_date.setText(getItem(position).getPubDate());
         holder.position =  position;
         //Fazer condicao para verificar se o item foi baixado ja
-        /*
+        ContentResolver cr = contextA.getContentResolver();
         if(!holder.download.getText().equals("")){
-            holder.download.setText("PLAY");
+            Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
+                    PodcastProviderContract.ALL_COLUMNS,
+                    "_id = " + (holder.position+1),
+                    null,
+                    null);
+            c.moveToFirst();
+            String state = c.getString(c.getColumnIndex("state"));
+            c.close();
+            holder.download.setText(state);
 
         }
-        */
+
         holder.item_title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -6,11 +6,11 @@ import android.provider.MediaStore;
 /**
  * Created by Matheus on 15/10/2017.
  */
-
+//CLASSE PARA SUPORTAR O GERENCIAMENTO
 public class ManagerMediaPlayer {
     private int id;
     private MediaPlayer mPlayer;
-    private int time;
+    private int time; //tempo em que o video foi pausado
     public ManagerMediaPlayer(int id, MediaPlayer mPlayer, int time) {
         this.id = id;
         this.mPlayer = mPlayer;

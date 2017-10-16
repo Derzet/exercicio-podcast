@@ -29,7 +29,7 @@ public class PodcastService extends Service {
             return PodcastService.this;
         }
     }
-    private String id="1";
+
     //database
     private ContentResolver cr ;
     private List<ManagerMediaPlayer> managerMediaPlayers;
@@ -85,7 +85,7 @@ public class PodcastService extends Service {
         }
 
         if (!existe) {
-            //observando que o elemento com id 0 não existe , precisamos tratrar
+            //observando que o elemento com id 0 não existe , precisamos tratar com uma soma
             Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
                     PodcastProviderContract.ALL_COLUMNS,
                     "_id = " + (id+1),
@@ -99,6 +99,7 @@ public class PodcastService extends Service {
             MediaPlayer mPlayer;
             mPlayer = new MediaPlayer();       //26
             mPlayer.reset();
+
             mPlayer.setDataSource(downloadURI);
             mPlayer.prepare();
             ManagerMediaPlayer  mMP = new ManagerMediaPlayer(id,mPlayer,mPlayer.getCurrentPosition());

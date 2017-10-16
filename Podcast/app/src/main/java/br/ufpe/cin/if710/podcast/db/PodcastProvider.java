@@ -3,11 +3,9 @@ package br.ufpe.cin.if710.podcast.db;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Log;
 
 public class PodcastProvider extends ContentProvider {
@@ -79,7 +77,7 @@ public class PodcastProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
           int count = 0;
-
+        //update dos itens
         if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)){
             count = database.update(
                     "episodes",

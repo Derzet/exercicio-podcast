@@ -6,16 +6,16 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
-import br.ufpe.cin.if710.podcast.domain.ManagerMediaPlayer;
+
 
 /**
  * Created by Matheus on 14/10/2017.
@@ -33,8 +33,8 @@ public class PodcastService extends Service {
 
     //database
     private ContentResolver cr ;
-    private List<ManagerMediaPlayer> managerMediaPlayers; //gerenciador de mediaplayer
-
+    private MediaPlayer mPlayer;
+    private int idAtual; //detectar o podcast atual
 
     /**
      * Class used for the client Binder.  Because we know this service always
@@ -44,100 +44,188 @@ public class PodcastService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //criar mediaplayer
         cr = getContentResolver();
-        managerMediaPlayers = new ArrayList<ManagerMediaPlayer>();
+        idAtual = -1; //id indicando que não foi inicializado
+        mPlayer = new MediaPlayer();
+        mPlayer.setLooping(false); //INDICANDO QUE NÃO HAVERÁ LOOP NESTE CASO
+        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer player) {
+                if(player.isPlaying()) {
+                    removeExternalStorage(); //REMOVENDO QUANDO COMPLETADO O PODCAST
+                }
+               // Log.e("CHAMANDO","ERRADO");
+            }
+        });
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e("PodcastIntentService","Entrou");
-
         return mBinder;
     }
 
     @Override
     public void onDestroy() {
-        for (ManagerMediaPlayer item : managerMediaPlayers) {
-            if (item.getmPlayer()!=null) {
-                item.getmPlayer().stop();
-                item.getmPlayer().release();
-            }
+        if(mPlayer!=null) {
+            mPlayer.pause();
+            mPlayer.stop();
+            mPlayer.reset();
+            mPlayer.release();
         }
     }
 
-    public void playPodcast(int id) throws IOException {
-        Log.e("PLAY", "INTENT SERVICE PLAY");
-        Log.d("PodcastIntentService", "Start");
-        Log.e("ID",id+"");
-        //iniciando uma intent para o broadcast
-        Boolean existe = false;
 
-        for (ManagerMediaPlayer item : managerMediaPlayers) {
-            if (id==item.getId()) {
-                existe = true;
-                int time = item.getTime();
-                item.getmPlayer().seekTo(time);
-                item.getmPlayer().start();
-              //  Log.e("PODCASTSERVICE","MUSICA JA EXISTIA");
-                break;
-            }
-        }
+    //referencia da pasta url
+    private String referencia(int id){
+        Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
+                PodcastProviderContract.ALL_COLUMNS,
+                "_id = " + (id+1),
+                null,
+                null);
+        c.moveToFirst();
+        String downloadURI = c.getString(c.getColumnIndex("downloadUri"));
+        c.close();
+        return downloadURI;
 
-        if (!existe) {
-            //observando que o elemento com id 0 não existe , precisamos tratar com uma soma
-            Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
-                    PodcastProviderContract.ALL_COLUMNS,
-                    "_id = " + (id+1),
-                    null,
-                    null);
-            c.moveToFirst();
-            String downloadURI = c.getString(c.getColumnIndex("downloadUri"));
-            c.close();
+    }
+    //recuperando tempo
+    private int geTime(int id){
+        Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
+                PodcastProviderContract.ALL_COLUMNS,
+                "_id = " + (id+1),
+                null,
+                null);
+        c.moveToFirst();
+        int time = Integer.parseInt(c.getString(c.getColumnIndex("time")));
+        c.close();
+        return time;
 
-            //inicializando o mediaplayer
-            MediaPlayer mPlayer;
-            mPlayer = new MediaPlayer();
-            mPlayer.reset();
-
-            mPlayer.setDataSource(downloadURI);
-            mPlayer.prepare();
-            ManagerMediaPlayer  mMP = new ManagerMediaPlayer(id,mPlayer,mPlayer.getCurrentPosition());
-            managerMediaPlayers.add(mMP);
-
-            for (ManagerMediaPlayer item : managerMediaPlayers) {
-                if (id==item.getId()) {
-                    item.getmPlayer().start();
-                    break;
-                }
-            }
-        }
-
+    }
+    //editando tempo
+    private void setTime(int id,int time){
+        ContentValues content = new ContentValues();
+        content.put(PodcastProviderContract.TIME,time+"" ); //STATUS ATUALIZADOS
+        int idN = id + 1;
+        cr.update(PodcastProviderContract.EPISODE_LIST_URI,
+                content,
+                idN + "",
+                null
+        );
+    }
+     //atualizando estado no banco e mainActivity
+    private void updateState(int id,String state){
+        ContentValues content = new ContentValues();
+        content.put(PodcastProviderContract.STATE, state); //STATUS ATUALIZADOS
+        int idN = id + 1;
+        cr.update(PodcastProviderContract.EPISODE_LIST_URI,
+                content,
+                idN + "",
+                null
+        );
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction("br.ufpe.cin.if710.podcast.action.NOTIFICATION");
         broadcastIntent.putExtra("position", id+"");
-        broadcastIntent.putExtra("state", "PAUSE");
+        broadcastIntent.putExtra("state", state);
         sendBroadcast(broadcastIntent);
 
     }
+    //tocando
+    public void playPodcast(int id) {
+        Log.i("Service", "PLAY");
+        //iniciando uma intent para o broadcast
+            //observando que o elemento com id 0 não existe , precisamos tratar com uma som
+            //inicializando o mediaplayer
+           if((idAtual!= -1) && (idAtual != id) ){ //se musica nova
+              pausePodcast(idAtual);
+               idAtual = id; //GERENCIA PELO ID ATUAL
+               try {
+                   //SETANDO NOVA MUSICA;
+                   mPlayer.stop();
+                  // mPlayer.release();
+                   mPlayer.reset();
+                   mPlayer.setDataSource(referencia(id));
+                   mPlayer.start();
+
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+
+           }else {
+               try {
+                   mPlayer.setDataSource(referencia(id)); //recuperar a referencia do download
+                   mPlayer.prepare();
+                   mPlayer.start();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+           }
+        idAtual = id; //GERENCIA PELO ID ATUAL
+
+        updateState(id, "PAUSE");
+
+
+    }
+
+    //pausando
     public void pausePodcast(int id){
-        Log.d("IntentService","PAUSE");
-        for (ManagerMediaPlayer item : managerMediaPlayers) {
-            if (id==item.getId() && item.getmPlayer().isPlaying()) {
-                int time = item.getmPlayer().getCurrentPosition();
-                 item.setTime(time);
-                 item.getmPlayer().pause();
-                break;
+        Log.i("Service","PAUSE");
+            if (mPlayer.isPlaying()) {
+                int time = mPlayer.getCurrentPosition();
+                this.setTime(id,time); //ATUALIZANDO TIME
+                mPlayer.pause();
             }
+        updateState(id,"RESUME");
+    }
+
+    public void resumePodcast(int id){
+        Log.i("Service","RESUME");
+        if((idAtual!= -1) && (idAtual != id) ){ //se musica nova , da tocada atual
+            pausePodcast(idAtual); //PAUSO A MUSICA QUE ESTA TOCANDO
+            idAtual = id; //GERENCIA PELO ID ATUAL
         }
 
-        //mando alterar
-        Intent broadcastIntent = new Intent();
-        broadcastIntent.setAction("br.ufpe.cin.if710.podcast.action.NOTIFICATION");
-        broadcastIntent.putExtra("position",id+"");
-        broadcastIntent.putExtra("state","PLAY");
-        sendBroadcast(broadcastIntent);
+        mPlayer.stop();
+
+        try {
+         //   mPlayer = new MediaPlayer();
+            mPlayer.reset();
+            mPlayer.setDataSource(referencia(id));
+            mPlayer.prepare();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+         mPlayer.seekTo(this.geTime(id));
+         mPlayer.start();
+           // updateState(id, "PAUSE");
+            idAtual = id; //GERENCIA PELO ID ATUAL
+      updateState(id,"PAUSE");
+
     }
+
+    //metodo de remoção da memória externa
+    private void removeExternalStorage(){
+        Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
+                PodcastProviderContract.ALL_COLUMNS,
+                "_id = " + (idAtual+1),
+                null,
+                null);
+        c.moveToFirst();
+        String downloadLink = c.getString(c.getColumnIndex("downloadLink"));
+        c.close();
+        Uri download = Uri.parse(downloadLink);
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                download.getLastPathSegment()); //pegando diretorio
+
+        if(file.exists()){ //VERIFICANDO EXISTENCIA DO ARQUIVO
+           file.delete();
+        }
+        setTime(idAtual,0);
+        updateState(idAtual,"BAIXAR");
+    }
+
+
+
 
 }

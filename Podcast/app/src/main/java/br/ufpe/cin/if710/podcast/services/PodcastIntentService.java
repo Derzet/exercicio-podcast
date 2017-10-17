@@ -1,12 +1,11 @@
 package br.ufpe.cin.if710.podcast.services;
 
-import android.app.DownloadManager;
+
 import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.media.MediaPlayer;
+
 import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
@@ -51,13 +50,16 @@ public class PodcastIntentService extends IntentService {
         String action = intent.getAction();
         //recuperando o contexto do banco de dados
         cr = getContentResolver();
-        Log.e("PodcastIntentService", "Entrou");
+        Log.i("PodcastIntentService", "INTENT SERVICE");
         String id = intent.getStringExtra("position");
         byte[] fileBytes = null;
 
         if (action.equals(ACTION_DOWNLOAD)) {
+            Log.i("PodcastIntentService", "BAIXANDO");
+            Log.i("PodcastIntentService","DOWNLOAD INICIALIZANDO");
+
             ItemFeed item = (ItemFeed) intent.getSerializableExtra("itemFeed");
-            Log.d("PodcastIntentService", "BAIXANDO");
+
             try {
                 fileBytes = downloadFileBytes(item.getDownloadLink());
             } catch (IOException e) {
@@ -84,7 +86,7 @@ public class PodcastIntentService extends IntentService {
                 e.printStackTrace();
             }
 
-            Log.d("DOWNLOAD",download.getLastPathSegment());
+
 
             ContentValues content = new ContentValues();
 
@@ -97,9 +99,9 @@ public class PodcastIntentService extends IntentService {
             content.put(PodcastProviderContract.URI,output.getAbsolutePath());
             content.put(PodcastProviderContract.STATE, "PLAY"); //STATUS ATUALIZADOS PARA PLAY
 
-            Log.d("PodcastIntentService", "FINISH DOWNLOAD");
+            Log.i("PodcastIntentService", "FINISH DOWNLOAD");
 
-            Log.d("PodcastIntentService", "Update");
+
             int idN = Integer.parseInt(id) + 1;
             cr.update(PodcastProviderContract.EPISODE_LIST_URI,
                     content,
@@ -107,7 +109,7 @@ public class PodcastIntentService extends IntentService {
                     null
             );
 
-            Log.d("PodcastIntentService", "FinishUpdate");
+
             //iniciando uma intent para o broadcast
             Intent broadcastIntent = new Intent();
             broadcastIntent.setAction("br.ufpe.cin.if710.podcast.action.NOTIFICATION");
@@ -118,7 +120,7 @@ public class PodcastIntentService extends IntentService {
 
         } else {
 
-            Log.d("IntentSerivceDownload", "URI DE DOWNLOAD NÃO INDETIFICADO");
+            Log.i("IntentSerivceDownload", "URI DE DOWNLOAD NÃO INDETIFICADO");
         }
     }
 

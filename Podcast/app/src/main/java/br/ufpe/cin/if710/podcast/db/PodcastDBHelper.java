@@ -31,6 +31,7 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
     public final static String EPISODE_DOWNLOAD_LINK = "downloadLink";
     public final static String EPISODE_FILE_URI = "downloadUri";
     public final static String EPISODE_STATE = "state"; //NOVO ESTADO PARA RECUPERAR OS STATUS DO BOTÃO
+    public final static String EPISODE_TIME = "time"; //NOVO ESTADO PARA RECUPERAR OS STATUS DO BOTÃO
     public final static String[] columns = {
             _ID, EPISODE_TITLE, EPISODE_DATE, EPISODE_LINK,
             EPISODE_DESC, EPISODE_DOWNLOAD_LINK, EPISODE_FILE_URI,EPISODE_STATE
@@ -44,7 +45,8 @@ public class PodcastDBHelper extends SQLiteOpenHelper {
                     + EPISODE_DESC + " TEXT NOT NULL, "
                     + EPISODE_DOWNLOAD_LINK + " TEXT NOT NULL, "
                     + EPISODE_FILE_URI + " TEXT NOT NULL, "
-                    + EPISODE_STATE + " TEXT NOT NULL)";
+                    + EPISODE_STATE + " TEXT NOT NULL, "
+                    + EPISODE_TIME +" TEXT NOT NULL)";
 
 
 

@@ -12,32 +12,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuItem;
-
 import android.widget.Button;
-
 import android.widget.ListView;
 import android.widget.Toast;
-
 import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
@@ -56,14 +50,13 @@ public class MainActivity extends Activity {
     private ListView items;
     private final String ACTION_NOTIFICATION = "br.ufpe.cin.if710.podcast.action.NOTIFICATION";
     private Context mContext;
-    //conectando meu broadcastRecieber
-    //private PodcastBroadCastReciever receiver;
+    //instância broadcastRecieber
     BroadcastReceiver receiver =  new BroadcastReceiver() {
 
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if(action.equals(ACTION_NOTIFICATION)) {
-                Log.d("Broadcast", "IntentBroadCast");
+              //  Log.d("Broadcast", "IntentBroadCast");
                     int position = Integer.parseInt(intent.getStringExtra("position"));
                 String state = intent.getStringExtra("state");
                 Button button  = items.getChildAt(position).findViewById(R.id.item_action);
@@ -72,23 +65,23 @@ public class MainActivity extends Activity {
                     Intent intentZ = new Intent(context, MainActivity.class);
                     PendingIntent contentIntent = PendingIntent.getActivity(context, 0, intentZ, PendingIntent.FLAG_UPDATE_CURRENT);
                     NotificationCompat.Builder b = new NotificationCompat.Builder(context);
-                    //.setSmallIcon(R.drawable.ic_launcher)
+                    //construindo a mensagem
                     b.setAutoCancel(true)
                             .setDefaults(Notification.DEFAULT_ALL)
                             .setWhen(System.currentTimeMillis())
                             .setTicker("PodCast100")
                             .setContentTitle("Podcast notification")
                             .setSmallIcon(R.mipmap.ic_launcher)
-                            .setContentText("Seu download foi concluído!")
+                            .setContentText("Seu download/remoção foi concluído!")
                             .setDefaults(Notification.DEFAULT_LIGHTS| Notification.DEFAULT_SOUND)
                             .setContentIntent(contentIntent)
                             .setContentInfo("Info");
 
-                      Toast.makeText(context,"Lista Atualizada,Novo episódio!",Toast.LENGTH_LONG).show();
+                      Toast.makeText(context,"Lista Atualizada!",Toast.LENGTH_LONG).show();
 
                     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                     notificationManager.notify(1, b.build());
-
+                    button.setEnabled(true); //habilitar o botão de volta
                     button.setText("PLAY");
                 }else{
                     button.setText(state);
@@ -106,8 +99,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         cr = getContentResolver(); //instancia para a activity para comunicar com o provide
         items = (ListView) findViewById(R.id.items);
-       // final Intent podcastServiceIntent = new Intent(this, PodcastService.class);
-       // startService(podcastServiceIntent);
+       // referencia minha aplicação
         mContext = this.getApplication();
         if(!isBound) {
             Intent intent = new Intent(this, PodcastService.class);
@@ -145,10 +137,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        //limpando adapter
-        XmlFeedAdapter adapter = (XmlFeedAdapter) items.getAdapter();
-        adapter.clear();
-        unregisterReceiver(receiver);
+
 
         showNotification();
 
@@ -167,7 +156,7 @@ public class MainActivity extends Activity {
                 .setTicker("PodCast100")
                 .setContentTitle("Podcast notification")
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentText("aproveite sua música!")
+                .setContentText("aproveite seu podcast!")
                 .setDefaults(Notification.DEFAULT_LIGHTS| Notification.DEFAULT_SOUND)
                 .setContentIntent(contentIntent)
                 .setContentInfo("Info");
@@ -179,7 +168,7 @@ public class MainActivity extends Activity {
     private class DownloadXmlTask extends AsyncTask<String, Void, List<ItemFeed>> {
         @Override
         protected void onPreExecute() {
-            Toast.makeText(getApplicationContext(), "iniciando...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "ATUALIZANDO...", Toast.LENGTH_SHORT).show();
         }
         @Override
         protected List<ItemFeed> doInBackground(String... params) {
@@ -193,8 +182,9 @@ public class MainActivity extends Activity {
                     content.put(PodcastProviderContract.LINK, item.getLink()); //revisar o parser
                     content.put(PodcastProviderContract.DESCRIPTION, item.getDescription());
                     content.put(PodcastProviderContract.DOWNLOAD_LINK, item.getDownloadLink());
-                    content.put(PodcastProviderContract.URI, "");
+                    content.put(PodcastProviderContract.URI, " ");
                     content.put(PodcastProviderContract.STATE,"BAIXAR");
+                    content.put(PodcastProviderContract.TIME,"0");
                           //INSERINDO O ITEM COM STATUS BAIXAR
                         getContentResolver().insert(PodcastProviderContract.EPISODE_LIST_URI,content);
                 }
@@ -211,7 +201,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onPostExecute(List<ItemFeed> feed) {
-            Toast.makeText(getApplicationContext(), "terminando...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "FINALIZANDO ATUALIZAÇÃO...", Toast.LENGTH_SHORT).show();
             //Cursor
             Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,
                     PodcastProviderContract.ALL_COLUMNS,
@@ -294,10 +284,37 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-
+        //limpando adapter,desconectando o bind
+        XmlFeedAdapter adapter = (XmlFeedAdapter) items.getAdapter();
+        adapter.clear();
+        unregisterReceiver(receiver);
         super.onDestroy();
         unbindService(sConn);
         isBound = false;
     }
+    final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 102;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        boolean canUseExternalStorage = false;
+
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    canUseExternalStorage = true;
+                }
+
+                if (!canUseExternalStorage) {
+                    Toast.makeText(this, "Cannot use this feature without requested permission", Toast.LENGTH_SHORT).show();
+                } else {
+                    //permisão caso aceitada
+                }
+            }
+        }
+    }
+
+
 
 }

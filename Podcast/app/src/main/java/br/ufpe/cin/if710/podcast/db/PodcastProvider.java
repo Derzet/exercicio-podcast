@@ -1,6 +1,7 @@
 package br.ufpe.cin.if710.podcast.db;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,7 +11,7 @@ import android.util.Log;
 
 public class PodcastProvider extends ContentProvider {
     private SQLiteDatabase database; // instancia do db
-
+    private AppDatabase databaseRoom;
 
     public PodcastProvider() {
     }
@@ -19,6 +20,7 @@ public class PodcastProvider extends ContentProvider {
     public boolean onCreate() {
         PodcastDBHelper db = PodcastDBHelper.getInstance(getContext());
         database = db.getWritableDatabase();
+        databaseRoom = AppDatabase.getAppDatabase(getContext());
         return true;
     }
 
@@ -37,12 +39,24 @@ public class PodcastProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        //INSERIR DADOS VERIFICANDO ID EXISTENTE
         if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)) {
-            long rowId = database.insertOrThrow(PodcastProviderContract.EPISODE_TABLE, null, values);
-            return Uri.withAppendedPath(PodcastProviderContract.EPISODE_LIST_URI, Long.toString(rowId));
+            // long rowId = database.insertOrThrow(PodcastProviderContract.EPISODE_TABLE, null, values);
+            //return Uri.withAppendedPath(PodcastProviderContract.EPISODE_LIST_URI, Long.toString(rowId));
+            String title = values.getAsString(PodcastProviderContract.TITLE);
+            String date = values.getAsString(PodcastProviderContract.DATE);
+            String link = values.getAsString(PodcastProviderContract.LINK);
+            String description = values.getAsString(PodcastProviderContract.DESCRIPTION);
+            String downloadLink = values.getAsString(PodcastProviderContract.DOWNLOAD_LINK);
+            String uriValue = values.getAsString(PodcastProviderContract.URI);
+            String state = values.getAsString(PodcastProviderContract.STATE);
+            String time = values.getAsString(PodcastProviderContract.TIME);
+
+            Podcast podcast = new Podcast(title, link, date, description, downloadLink, uriValue, state, time);
+            Log.d("Tag", podcast.getDownloadLink());
+            final long id = databaseRoom.podcastDao().insertPodcast(podcast);
+            return ContentUris.withAppendedId(uri, id);
         }else{
-                throw new IllegalArgumentException("Unknown URI: " + uri);
+            throw new IllegalArgumentException("Unknown URI: " + uri);
         }
     }
 
@@ -57,21 +71,11 @@ public class PodcastProvider extends ContentProvider {
         Cursor cursor;
         Log.d("PROVIDER",uri.getLastPathSegment());
         if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)){
-             cursor = queryBuilder.query(
-                    database,
-                    projection,
-                    selection,
-                    selectionArgs,
-                    null,
-                    null,
-                    sortOrder
-            );
-
+            cursor = databaseRoom.podcastDao().selectAll();
+            return cursor;
         }else{
-            throw new IllegalArgumentException("Unknown URI: " + uri);
-        }
+            throw new IllegalArgumentException("Unknown URI: " + uri);}
 
-        return cursor;
     }
 
     @Override

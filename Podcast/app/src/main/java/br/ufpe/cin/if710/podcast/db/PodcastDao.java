@@ -6,6 +6,7 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
+import android.database.Cursor;
 
 /**
  * Created by Matheus on 09/12/2017.
@@ -15,7 +16,7 @@ import android.arch.persistence.room.Update;
 public interface PodcastDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT) //DEFAULT
-    public void insertPodcast(Podcast podcast);
+    public long insertPodcast(Podcast podcast);
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     public void insertPodcasts(Podcast ... podcasts);
@@ -28,5 +29,5 @@ public interface PodcastDao {
 
 
     @Query("SELECT * FROM podcast")
-    public Podcast[] loadAllPodcast();
+    public Cursor selectAll();
 }

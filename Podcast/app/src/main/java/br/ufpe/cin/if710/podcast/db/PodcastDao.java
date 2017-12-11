@@ -22,7 +22,7 @@ public interface PodcastDao {
     public void insertPodcasts(Podcast ... podcasts);
 
     @Update
-    public void updatePodcasts(Podcast... podcasts);
+    public int updatePodcast(Podcast podcasts);
 
     @Delete
     public void deletePodcasts(Podcast... podcasts);

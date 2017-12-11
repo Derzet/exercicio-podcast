@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import br.ufpe.cin.if710.podcast.R;
+import br.ufpe.cin.if710.podcast.db.AppDatabase;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
@@ -98,6 +99,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         cr = getContentResolver(); //instancia para a activity para comunicar com o provide
+       // AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext()); referencia do db
+
+
         items = (ListView) findViewById(R.id.items);
        // referencia minha aplicação
         mContext = this.getApplication();

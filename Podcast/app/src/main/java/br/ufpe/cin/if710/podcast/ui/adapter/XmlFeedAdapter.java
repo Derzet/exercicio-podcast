@@ -1,8 +1,5 @@
 package br.ufpe.cin.if710.podcast.ui.adapter;
 
-import java.io.IOException;
-import java.util.List;
-
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -17,15 +14,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import br.ufpe.cin.if710.podcast.R;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
-import br.ufpe.cin.if710.podcast.services.PodcastIntentService;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
+import br.ufpe.cin.if710.podcast.services.PodcastIntentService;
 import br.ufpe.cin.if710.podcast.ui.EpisodeDetailActivity;
 import br.ufpe.cin.if710.podcast.ui.MainActivity;
 
-
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static java.lang.String.valueOf;
 
 public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
@@ -37,6 +36,8 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         super(context, resource, objects);
         contextA = context;
         linkResource = resource;
+
+
     }
 
     public void setMainActivity(MainActivity callback){
@@ -77,6 +78,7 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
         int position;
     }
 
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
@@ -93,13 +95,15 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
 
         holder.item_title.setText(getItem(position).getTitle());
         holder.item_date.setText(getItem(position).getPubDate());
+
+
         holder.position =  position;
 
          //recuperando estado do botão
         ContentResolver cr = contextA.getContentResolver();
             Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
                     PodcastProviderContract.ALL_COLUMNS,
-                    "_id = " + (holder.position+1),
+                    valueOf(holder.position+1),
                     null,
                     null);
             c.moveToFirst();
@@ -116,10 +120,12 @@ public class XmlFeedAdapter extends ArrayAdapter<ItemFeed> {
                 i.addFlags(FLAG_ACTIVITY_NEW_TASK);
                 contextA.startActivity(i); //getAplicationContext
                 //https://stackoverflow.com/questions/4197135/how-to-start-activity-in-adapter
+                //mainActivity.getTime(v);
                    }
             }
 
         );
+
 
         holder.download.setOnClickListener(new View.OnClickListener() {
             @Override

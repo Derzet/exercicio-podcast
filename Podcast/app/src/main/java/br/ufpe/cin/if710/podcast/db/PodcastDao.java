@@ -30,4 +30,14 @@ public interface PodcastDao {
 
     @Query("SELECT * FROM podcast")
     public Cursor selectAll();
+
+    @Query("SELECT * FROM " + "podcast" + " WHERE " + "id" + " = :id")
+    public Cursor selectById (long id);
+
+    @Query("UPDATE podcast SET " + "time" + "= :time" + " WHERE " + "id" + "=:id ")
+    public int UpdateTime(long id, long time);
+
+    @Query("UPDATE podcast SET " + "state" + "= :state" + " WHERE " + "id" + "=:id ")
+    public int UpdateState(long id, String state);
+
 }

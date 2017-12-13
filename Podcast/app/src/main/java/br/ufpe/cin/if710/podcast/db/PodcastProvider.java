@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
+import static java.lang.String.valueOf;
+
 public class PodcastProvider extends ContentProvider {
     private SQLiteDatabase database; // instancia do db
     private AppDatabase databaseRoom;
@@ -52,10 +54,10 @@ public class PodcastProvider extends ContentProvider {
             String time = values.getAsString(PodcastProviderContract.TIME);
 
             Podcast podcast = new Podcast(title, link, date, description, downloadLink, uriValue, state, time);
-            Log.d("Tag", podcast.getDownloadLink());
+            // Log.d("Tag", podcast.getDownloadLink());
             final long id = databaseRoom.podcastDao().insertPodcast(podcast);
             return ContentUris.withAppendedId(uri, id);
-        }else{
+        } else {
             throw new IllegalArgumentException("Unknown URI: " + uri);
         }
     }
@@ -65,41 +67,78 @@ public class PodcastProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        // Usando SQLiteQueryBuilder para criar uma seleção
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
         queryBuilder.setTables(PodcastProviderContract.EPISODE_TABLE);
         Cursor cursor;
-        Log.d("PROVIDER",uri.getLastPathSegment());
-        if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)){
-            cursor = databaseRoom.podcastDao().selectAll();
-            return cursor;
-        }else{
-            throw new IllegalArgumentException("Unknown URI: " + uri);}
 
+        if (selection != null) {
+            cursor = databaseRoom.podcastDao().selectById(Long.parseLong(selection));
+            return cursor;
+        } else {
+            // Usando SQLiteQueryBuilder para criar uma seleção
+            Log.d("PROVIDER", uri.getLastPathSegment());
+            if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)) {
+                cursor = databaseRoom.podcastDao().selectAll();
+                return cursor;
+            } else {
+                throw new IllegalArgumentException("Unknown URI: " + uri);
+            }
+
+        }
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-          int count = 0;
-        //update dos itens
-        if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)){
-            count = database.update(
-                    "episodes",
-                    values,
-                      PodcastProviderContract._ID
-                              +" = "
-                              + selection,
-                    selectionArgs
 
-            );
+        if (uri.getLastPathSegment().equals(PodcastProviderContract.EPISODE_TABLE)) {
+           if (selectionArgs==null){
+                // long id = values.getAsLong(PodcastProviderContract._ID);
+                String title = values.getAsString(PodcastProviderContract.TITLE);
+                String date = values.getAsString(PodcastProviderContract.DATE);
+                String link = values.getAsString(PodcastProviderContract.LINK);
+                String description = values.getAsString(PodcastProviderContract.DESCRIPTION);
+                String downloadLink = values.getAsString(PodcastProviderContract.DOWNLOAD_LINK);
+                String uriValue = values.getAsString(PodcastProviderContract.URI);
+                String state = values.getAsString(PodcastProviderContract.STATE);
+                String time = values.getAsString(PodcastProviderContract.TIME);
 
-        }else{
-            throw new IllegalArgumentException("Unknown URI: " + uri);
+                Podcast podcast = new Podcast(title, link, date, description, downloadLink, uriValue, state, time);
+                Log.d("States", podcast.getState() + " ");
+                podcast.setId(Long.parseLong(selection));
+                Log.d("ID", valueOf(podcast.getId()));
+
+                int count = databaseRoom.podcastDao().updatePodcast(podcast);
+                //         Log.d("Count", valueOf(count));
+                getContext().getContentResolver().notifyChange(uri, null);
+                return count;
+            }
+
+            if (selectionArgs[0].equals("Status")) {
+
+                Log.d("Status", "Entrou");
+                String status = values.getAsString(PodcastProviderContract.STATE);
+                return databaseRoom.podcastDao().UpdateState(Long.parseLong(selection), status);
+            } else if (selectionArgs[0].equals("Time")) {
+
+                Log.d("Time", "Entrou");
+                long time = values.getAsLong(PodcastProviderContract.TIME);
+                return databaseRoom.podcastDao().UpdateTime(Long.parseLong(selection), time);
+            }
         }
-
-
-        getContext().getContentResolver().notifyChange(uri, null);
-        return count;
+        throw new IllegalArgumentException("Unknown URI: " + uri);
     }
+  /*  public int updateStatus(Uri uri, ContentValues values, String selection,
+                            String[] selectionArgs) {
+        String status = values.getAsString(PodcastProviderContract.STATE);
+        return databaseRoom.podcastDao().UpdateState(Long.parseLong(selection), status);
+
+    }
+    public int updateTime(Uri uri, ContentValues values, String selection,
+                            String[] selectionArgs) {
+        long time = values.getAsLong(PodcastProviderContract.TIME);
+        return databaseRoom.podcastDao().UpdateTime(Long.parseLong(selection), time);
+
+    }
+    */
 }

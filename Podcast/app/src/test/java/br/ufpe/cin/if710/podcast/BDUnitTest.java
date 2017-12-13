@@ -2,7 +2,11 @@ package br.ufpe.cin.if710.podcast;
 
 import android.content.Context;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import br.ufpe.cin.if710.podcast.db.AppDatabase;
+import br.ufpe.cin.if710.podcast.db.Podcast;
 
 /**
  * Created by gabri on 11/12/2017.
@@ -11,7 +15,7 @@ import br.ufpe.cin.if710.podcast.db.AppDatabase;
 public class BDUnitTest {
     private Context instrumentationCtx;
     private AppDatabase databaseRoom;
-/*
+
     @Before  //necessita de ajustes
     public void iniciaBD(){
         databaseRoom = AppDatabase.getAppDatabase(instrumentationCtx.getApplicationContext());
@@ -24,5 +28,5 @@ public class BDUnitTest {
         int quantidade = databaseRoom.podcastDao().selectAll().getCount();
         assert quantidade > 0;
     }
-*/
+
 }

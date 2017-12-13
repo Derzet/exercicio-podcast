@@ -14,7 +14,10 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
+
+import static java.lang.String.valueOf;
 
 
 /**
@@ -79,11 +82,12 @@ public class PodcastService extends Service {
     private String referencia(int id){
         Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
                 PodcastProviderContract.ALL_COLUMNS,
-                "_id = " + (id+1),
+                valueOf(id+1),
                 null,
                 null);
         c.moveToFirst();
         String downloadURI = c.getString(c.getColumnIndex("downloadUri"));
+        Log.d("UriDown", downloadURI + " ");
         c.close();
         return downloadURI;
 
@@ -92,7 +96,7 @@ public class PodcastService extends Service {
     private int geTime(int id){
         Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
                 PodcastProviderContract.ALL_COLUMNS,
-                "_id = " + (id+1),
+                valueOf(id+1),
                 null,
                 null);
         c.moveToFirst();
@@ -105,22 +109,26 @@ public class PodcastService extends Service {
     private void setTime(int id,int time){
         ContentValues content = new ContentValues();
         content.put(PodcastProviderContract.TIME,time+"" ); //STATUS ATUALIZADOS
-        int idN = id + 1;
+        String[] array = new String[1];
+        array[0] = "Time";
+       int idN = id;
         cr.update(PodcastProviderContract.EPISODE_LIST_URI,
                 content,
-                idN + "",
-                null
+                valueOf(idN+1),
+                array
         );
     }
      //atualizando estado no banco e mainActivity
     private void updateState(int id,String state){
         ContentValues content = new ContentValues();
         content.put(PodcastProviderContract.STATE, state); //STATUS ATUALIZADOS
-        int idN = id + 1;
+        String[] array = new String[1];
+        array[0] = "Status";
+        int idN = id;
         cr.update(PodcastProviderContract.EPISODE_LIST_URI,
                 content,
-                idN + "",
-                null
+                valueOf(idN+1),
+                array
         );
 
         Intent broadcastIntent = new Intent();
@@ -133,6 +141,8 @@ public class PodcastService extends Service {
     //tocando
     public void playPodcast(int id) {
         Log.i("Service", "PLAY");
+        Log.d("IDPlay", valueOf(id));
+        Log.d("Ref", referencia(id));
         //iniciando uma intent para o broadcast
             //observando que o elemento com id 0 não existe , precisamos tratar com uma som
             //inicializando o mediaplayer
@@ -208,7 +218,7 @@ public class PodcastService extends Service {
     private void removeExternalStorage(){
         Cursor c = cr.query(PodcastProviderContract.EPISODE_LIST_URI,
                 PodcastProviderContract.ALL_COLUMNS,
-                "_id = " + (idAtual+1),
+                valueOf(idAtual+1),
                 null,
                 null);
         c.moveToFirst();

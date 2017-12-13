@@ -1,9 +1,11 @@
 package br.ufpe.cin.if710.podcast.ui;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -17,14 +19,20 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,18 +40,35 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import br.ufpe.cin.if710.podcast.R;
-import br.ufpe.cin.if710.podcast.db.AppDatabase;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
+import br.ufpe.cin.if710.podcast.domain.LiveDataTeste;
 import br.ufpe.cin.if710.podcast.domain.XmlFeedParser;
 import br.ufpe.cin.if710.podcast.services.PodcastService;
 import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
+ /*   XmlFeedParser x = new XmlFeedParser();
+    TextView text;
+    Button b;
+    static Button ksad;
+    private static Activity var;
+    static Activity activity;
+
+    void setStaticActivity() {
+        activity = this;
+    }
+lixo para testar canaryleak*/
 
 
+
+
+    private static String testleak2 = SettingsActivity.FEED_LINK;
+
+    private LiveDataTeste mModel;
     //ao fazer envio da resolucao, use este link no seu codigo!
     private final String RSS_FEED = "http://leopoldomt.com/if710/fronteirasdaciencia.xml";
     private ContentResolver cr ; //adicionado o content
@@ -97,10 +122,42 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Theme_AppCompat_Light_DarkActionBar);
         setContentView(R.layout.activity_main);
         cr = getContentResolver(); //instancia para a activity para comunicar com o provide
-       // AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext()); referencia do db
+        // AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext()); referencia do db
 
+        mModel = ViewModelProviders.of(this).get(LiveDataTeste.class);
+
+        subscribe(mModel);
+
+/*        LiveDataTeste.getData().observe(this, (Long time) -> {
+            ((TextView)findViewById(R.id.last_update)).setText(""+time);
+        });
+*/
+
+
+/*        final Observer<Long> nameObserver = new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable final Long newData) {
+                // Update the UI, in this case, a TextView.
+                ((TextView) findViewById(R.id.lastest_update)).setText("Ultima att feita em: "+newData);
+            }
+        };
+*/
+
+/*
+        mModel = ViewModelProviders.of(this).get(LiveDataTeste.class);
+        mModel.getData().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable final Long newData) {
+                // Update the UI, in this case, a TextView.
+                if (newData != null) {
+                    ((TextView) findViewById(R.id.lastest_update)).setText("Ultima att feita em: ");
+                }
+            }
+        });
+*/
 
         items = (ListView) findViewById(R.id.items);
        // referencia minha aplicação
@@ -111,6 +168,22 @@ public class MainActivity extends Activity {
             bindService(intent, sConn, Context.BIND_AUTO_CREATE);
         }
 
+    }
+
+    private void subscribe(LiveDataTeste model) {
+        final Observer<Long> elapsedTimeObserver = new Observer<Long>() {
+            @Override
+            public void onChanged(@Nullable final Long aLong) {
+                ((TextView) findViewById(R.id.lastest_update)).setText(aLong.toString());
+                Log.d("ChronoActivity3", "Updating timer");
+            }
+        };
+        Log.d("TagF", "a");
+        if(model != null) {
+            Log.d("TagINN", mModel.getElapsedTime().getValue().toString());
+            Log.d("TagIn", "a");
+//            model.getElapsedTime().observe(this, elapsedTimeObserver);
+        }
     }
 
     @Override
@@ -136,6 +209,10 @@ public class MainActivity extends Activity {
         //filter.addCategory(Intent.CATEGORY_DEFAULT);
         registerReceiver(receiver,filter );
         new DownloadXmlTask().execute(RSS_FEED);
+
+
+
+      //lixo para testar canary leak  setStaticActivity();
     }
 
     @Override
@@ -168,8 +245,14 @@ public class MainActivity extends Activity {
         notificationManager.notify(1, b.build());
     }
 
+    @NonNull
+    @Override
+    public Lifecycle getLifecycle() {
+        return null;
+    }
 
-    private class DownloadXmlTask extends AsyncTask<String, Void, List<ItemFeed>> {
+
+    public class DownloadXmlTask extends AsyncTask<String, Void, List<ItemFeed>> {
         @Override
         protected void onPreExecute() {
             Toast.makeText(getApplicationContext(), "ATUALIZANDO...", Toast.LENGTH_SHORT).show();
@@ -217,7 +300,9 @@ public class MainActivity extends Activity {
             List<ItemFeed> mArrayList = new ArrayList<ItemFeed>();
             if (c.moveToFirst()){
                 do{
+                  //  Log.d("title", c.getString(c.getColumnIndex("title")));
                     String title = c.getString(c.getColumnIndex("title"));
+                    Log.d("LogTitle", title + " ");
                     String pubDate = c.getString(c.getColumnIndex("pubDate"));
                     String description = c.getString(c.getColumnIndex("description"));
                     String link = c.getString(c.getColumnIndex("link"));
@@ -226,7 +311,6 @@ public class MainActivity extends Activity {
                 }while(c.moveToNext());
             }
             c.close();
-
             //adapter Personalizado
             XmlFeedAdapter adapter = new XmlFeedAdapter(getMainActivity().getApplicationContext(),R.layout.itemlista, mArrayList);
             adapter.setMainActivity(getMainActivity());
@@ -290,7 +374,9 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         //limpando adapter,desconectando o bind
         XmlFeedAdapter adapter = (XmlFeedAdapter) items.getAdapter();
-        adapter.clear();
+        if(adapter != null){
+            adapter.clear();
+        }
         unregisterReceiver(receiver);
         super.onDestroy();
         unbindService(sConn);

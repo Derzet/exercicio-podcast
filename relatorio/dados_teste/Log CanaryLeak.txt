@@ -1,0 +1,225 @@
+In br.ufpe.cin.if710.podcast:1.0:1.
+* br.ufpe.cin.if710.podcast.ui.MainActivity has leaked:
+* GC ROOT thread java.lang.Thread.<Java Local> (named 'AsyncTask #1')
+* leaks br.ufpe.cin.if710.podcast.ui.MainActivity instance
+
+* Retaining: 3.3 kB.
+* Reference Key: f7ef05f8-3ee7-423d-8ac9-9715094d523b
+* Device: Google google Android SDK built for x86 sdk_gphone_x86
+* Android Version: 8.1.0 API: 27 LeakCanary: 1.5.4 74837f0
+* Durations: watch=5034ms, gc=217ms, heap dump=2011ms, analysis=8750ms
+
+* Details:
+* Instance of java.lang.Thread
+|   static NANOS_PER_MILLI = 1000000
+|   static EMPTY_STACK_TRACE = java.lang.StackTraceElement[0]@1890030720 (0x70a79480)
+|   static MAX_PRIORITY = 10
+|   static $class$shadow$_klass_ = java.lang.Class
+|   static $class$classSize = 352
+|   static $class$extData = null
+|   static $class$referenceInstanceOffsets = 8191
+|   static MIN_PRIORITY = 1
+|   static $class$numReferenceInstanceFields = 13
+|   static $class$classLoader = null
+|   static $class$numReferenceStaticFields = 4
+|   static NORM_PRIORITY = 5
+|   static $class$superClass = java.lang.Object
+|   static $class$objectSizeAllocFastPath = 136
+|   static $classOverhead = byte[184]@1889763785 (0x70a381c9)
+|   static $class$status = 11
+|   static $class$shadow$_monitor_ = 536870912
+|   static defaultUncaughtExceptionHandler = com.android.internal.os.RuntimeInit$KillApplicationHandler@316944232 (0x12e42f68)
+|   static $class$classFlags = 0
+|   static $class$vtable = null
+|   static $class$objectSize = 132
+|   static threadInitNumber = 9
+|   static threadSeqNumber = 267
+|   static $class$dexCache = java.lang.DexCache@1889766808 (0x70a38d98)
+|   static $class$ifTable = java.lang.Object[2]@1890030696 (0x70a79468)
+|   static $class$componentType = null
+|   static $class$name = java.lang.String@1890630664 (0x70b0bc08)
+|   static uncaughtExceptionPreHandler = com.android.internal.os.RuntimeInit$LoggingHandler@316944240 (0x12e42f70)
+|   static SUBCLASS_IMPLEMENTATION_PERMISSION = java.lang.RuntimePermission@1890030736 (0x70a79490)
+|   static $class$dexClassDefIndex = 70
+|   static $class$virtualMethodsOffset = 39
+|   static $class$primitiveType = 131072
+|   static $class$iFields = 1890633236
+|   static $class$accessFlags = 524289
+|   static $class$copiedMethodsOffset = 75
+|   static $class$dexTypeIndex = 362
+|   static $class$methods = 1891182536
+|   static $class$sFields = 1890633072
+|   static $class$clinitThreadId = 0
+|   blocker = null
+|   blockerLock = java.lang.Object@317491048 (0x12ec8768)
+|   contextClassLoader = dalvik.system.PathClassLoader@316973872 (0x12e4a330)
+|   daemon = false
+|   eetop = 0
+|   group = java.lang.ThreadGroup@1889776040 (0x70a3b1a8)
+|   inheritableThreadLocals = null
+|   inheritedAccessControlContext = java.security.AccessControlContext@317491056 (0x12ec8770)
+|   lock = java.lang.Object@317491064 (0x12ec8778)
+|   name = java.lang.String@317491072 (0x12ec8780)
+|   nativeParkEventPointer = 0
+|   nativePeer = 2541308928
+|   parkBlocker = null
+|   parkState = 1
+|   priority = 5
+|   single_step = false
+|   stackSize = 0
+|   started = true
+|   stillborn = false
+|   target = java.util.concurrent.ThreadPoolExecutor$Worker@316941128 (0x12e42348)
+|   threadLocalRandomProbe = 0
+|   threadLocalRandomSecondarySeed = 0
+|   threadLocalRandomSeed = 0
+|   threadLocals = java.lang.ThreadLocal$ThreadLocalMap@317491104 (0x12ec87a0)
+|   threadQ = null
+|   threadStatus = 0
+|   tid = 257
+|   uncaughtExceptionHandler = null
+|   shadow$_klass_ = java.lang.Thread
+|   shadow$_monitor_ = 0
+* Instance of br.ufpe.cin.if710.podcast.ui.MainActivity
+|   static $change = null
+|   static $class$shadow$_klass_ = java.lang.Class
+|   static $class$classSize = 2256
+|   static $class$extData = null
+|   static $class$referenceInstanceOffsets = -1073741824
+|   static $class$numReferenceInstanceFields = 9
+|   static $class$classLoader = dalvik.system.PathClassLoader@316973872 (0x12e4a330)
+|   static $class$numReferenceStaticFields = 2
+|   static $class$superClass = android.support.v7.app.AppCompatActivity
+|   static $class$objectSizeAllocFastPath = 312
+|   static $classOverhead = byte[2116]@316938041 (0x12e41739)
+|   static $class$status = 11
+|   static $class$shadow$_monitor_ = -2027152768
+|   static $class$classFlags = 0
+|   static $class$vtable = null
+|   static $class$objectSize = 312
+|   static $class$dexCache = java.lang.DexCache@317372776 (0x12eab968)
+|   static $class$ifTable = java.lang.Object[32]@317487992 (0x12ec7b78)
+|   static $class$componentType = null
+|   static $class$name = java.lang.String@317488136 (0x12ec7c08)
+|   static testleak2 = java.lang.String@316984664 (0x12e4cd58)
+|   static $class$dexClassDefIndex = 6
+|   static $class$virtualMethodsOffset = 13
+|   static $class$primitiveType = 131072
+|   static $class$iFields = 3003108408
+|   static $class$accessFlags = 524289
+|   static $class$copiedMethodsOffset = 22
+|   static serialVersionUID = -3522031987841087831
+|   static $class$dexTypeIndex = 135
+|   static $class$methods = 3003108592
+|   static $class$sFields = 3003108352
+|   static $class$clinitThreadId = 10806
+|   ACTION_NOTIFICATION = java.lang.String@316982184 (0x12e4c3a8)
+|   MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 102
+|   RSS_FEED = java.lang.String@316940664 (0x12e42178)
+|   cr = android.app.ContextImpl$ApplicationContentResolver@317433792 (0x12eba7c0)
+|   isBound = false
+|   items = android.widget.ListView@317433824 (0x12eba7e0)
+|   mContext = br.ufpe.cin.if710.podcast.ui.MyApplication@316951424 (0x12e44b80)
+|   mModel = br.ufpe.cin.if710.podcast.domain.LiveDataTeste@317434952 (0x12ebac48)
+|   podcastService = br.ufpe.cin.if710.podcast.services.PodcastService@317278216 (0x12e94808)
+|   receiver = br.ufpe.cin.if710.podcast.ui.MainActivity$1@317434968 (0x12ebac58)
+|   sConn = br.ufpe.cin.if710.podcast.ui.MainActivity$3@317434992 (0x12ebac70)
+|   mDelegate = android.support.v7.app.AppCompatDelegateImplN@317435008 (0x12ebac80)
+|   mEatKeyUpEvent = false
+|   mResources = null
+|   mThemeId = 2131558669
+|   mCreated = true
+|   mFragments = android.support.v4.app.FragmentController@317435152 (0x12ebad10)
+|   mHandler = android.support.v4.app.FragmentActivity$1@317435168 (0x12ebad20)
+|   mNextCandidateRequestIndex = 0
+|   mPendingFragmentActivityResults = android.support.v4.util.SparseArrayCompat@317435200 (0x12ebad40)
+|   mReallyStopped = true
+|   mRequestedPermissionsFromFragment = false
+|   mResumed = false
+|   mRetaining = false
+|   mStopped = true
+|   mStartedActivityFromFragment = false
+|   mStartedIntentSenderFromFragment = false
+|   mExtraDataMap = android.support.v4.util.SimpleArrayMap@317435224 (0x12ebad58)
+|   mLifecycleRegistry = android.arch.lifecycle.LifecycleRegistry@317435248 (0x12ebad70)
+|   mActionBar = null
+|   mActionModeTypeStarting = 0
+|   mActivityInfo = android.content.pm.ActivityInfo@317435280 (0x12ebad90)
+|   mActivityTransitionState = android.app.ActivityTransitionState@317435432 (0x12ebae28)
+|   mApplication = br.ufpe.cin.if710.podcast.ui.MyApplication@316951424 (0x12e44b80)
+|   mAutoFillResetNeeded = false
+|   mAutofillManager = null
+|   mAutofillPopupWindow = null
+|   mCalled = true
+|   mCanEnterPictureInPicture = false
+|   mChangeCanvasToTranslucent = false
+|   mChangingConfigurations = false
+|   mComponent = android.content.ComponentName@317435488 (0x12ebae60)
+|   mConfigChangeFlags = 0
+|   mCurrentConfig = android.content.res.Configuration@317435504 (0x12ebae70)
+|   mDecor = null
+|   mDefaultKeyMode = 0
+|   mDefaultKeySsb = null
+|   mDestroyed = true
+|   mDoReportFullyDrawn = false
+|   mEmbeddedID = null
+|   mEnableDefaultActionBarUp = false
+|   mEnterTransitionListener = android.app.SharedElementCallback$1@1893042912 (0x70d58ae0)
+|   mExitTransitionListener = android.app.SharedElementCallback$1@1893042912 (0x70d58ae0)
+|   mFinished = true
+|   mFragments = android.app.FragmentController@317435616 (0x12ebaee0)
+|   mHandler = android.os.Handler@317435632 (0x12ebaef0)
+|   mHasCurrentPermissionsRequest = false
+|   mIdent = 128277263
+|   mInstanceTracker = android.os.StrictMode$InstanceTracker@317435664 (0x12ebaf10)
+|   mInstrumentation = android.app.Instrumentation@317279824 (0x12e94e50)
+|   mIntent = android.content.Intent@317435680 (0x12ebaf20)
+|   mLastAutofillId = 1073741823
+|   mLastNonConfigurationInstances = null
+|   mMainThread = android.app.ActivityThread@316932528 (0x12e401b0)
+|   mManagedCursors = java.util.ArrayList@317435744 (0x12ebaf60)
+|   mManagedDialogs = null
+|   mMenuInflater = null
+|   mParent = null
+|   mReferrer = null
+|   mRestoredFromBundle = false
+|   mResultCode = 0
+|   mResultData = null
+|   mResumed = false
+|   mSearchEvent = null
+|   mSearchManager = null
+|   mStartedActivity = false
+|   mStopped = true
+|   mTaskDescription = android.app.ActivityManager$TaskDescription@317435768 (0x12ebaf78)
+|   mTemporaryPause = false
+|   mTitle = java.lang.String@317271352 (0x12e92d38)
+|   mTitleColor = 0
+|   mTitleReady = true
+|   mToken = android.os.BinderProxy@317435808 (0x12ebafa0)
+|   mTranslucentCallback = null
+|   mUiThread = java.lang.Thread@1940826488 (0x73aea978)
+|   mVisibleFromClient = true
+|   mVisibleFromServer = true
+|   mVoiceInteractor = null
+|   mWindow = com.android.internal.policy.PhoneWindow@317435840 (0x12ebafc0)
+|   mWindowAdded = true
+|   mWindowManager = android.view.WindowManagerImpl@317436208 (0x12ebb130)
+|   mInflater = com.android.internal.policy.PhoneLayoutInflater@317436232 (0x12ebb148)
+|   mOverrideConfiguration = null
+|   mResources = android.content.res.Resources@317436280 (0x12ebb178)
+|   mTheme = android.content.res.Resources$Theme@317436320 (0x12ebb1a0)
+|   mThemeResource = 2131558669
+|   mBase = android.app.ContextImpl@317436336 (0x12ebb1b0)
+|   shadow$_klass_ = br.ufpe.cin.if710.podcast.ui.MainActivity
+|   shadow$_monitor_ = 1232592458
+* Excluded Refs:
+| Field: android.view.textservice.SpellCheckerSession$1.this$0
+| Field: android.view.Choreographer$FrameDisplayEventReceiver.mMessageQueue (always)
+| Thread:FinalizerWatchdogDaemon (always)
+| Thread:main (always)
+| Thread:LeakCanary-Heap-Dump (always)
+| Class:java.lang.ref.WeakReference (always)
+| Class:java.lang.ref.SoftReference (always)
+| Class:java.lang.ref.PhantomReference (always)
+| Class:java.lang.ref.Finalizer (always)
+| Class:java.lang.ref.FinalizerReference (always)

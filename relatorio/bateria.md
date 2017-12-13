@@ -1,0 +1,10 @@
+﻿# bateria
+
+# Análise
+
+---
+
+# Boas práticas
+
+----
+

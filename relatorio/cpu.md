@@ -10,11 +10,15 @@ Fim Download: Uso de CPU sofre um certo pico antes de ser finalizado.
 
 Tocando o Podcast: Uso de CPU entre baixo e moderado logo após o play. Utilização cpu 0 a 2%. 
 
-Imagens Abaixo:
-
-[<img src="http://www.google.com.au/images/nav_logo7.png">](http://google.com.au/)
-
 ---
 
 # Boas Práticas
+
+
+Uso de threads no background, reciclagem de View diminuindo o gasto no cpu, 
+utilização do padrão Serializable  na classe ItemFeed e Registrar e desregistrar
+um BroadcastReceiver.
+
+
+
 ----

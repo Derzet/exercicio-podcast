@@ -21,6 +21,8 @@ Tocando o Podcast: Uso de memória sobe e permanece constante em 78.8 MB.
 Constatou-se Memory Leak quando estava modificando o código, mas o Leak Canary não apresentou 
 outro aviso. 
 
+Aparentemente, o problema foi resolvido após retirarmos algumas linhas de código que estavam esquecidas e não mais sendo utilizadas, entre algumas delas, a principal acabava obtendo o contexto da aplicação e realizando literalmente nada após obter o mesmo.
+
 ---
 
 

@@ -36,10 +36,4 @@ public class BDTest {
         int quantidade = databaseRoom.podcastDao().selectAll().getCount();
         assertEquals(1, quantidade);
     }
-    @Test
-    public void update (){}
-
-    @Test
-    public void delete (){}
-
 }

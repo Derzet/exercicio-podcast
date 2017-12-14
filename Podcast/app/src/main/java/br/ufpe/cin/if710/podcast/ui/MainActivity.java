@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements LifecycleOwner {
 
         items = (ListView) findViewById(R.id.items);
        // referencia minha aplicação
-        mContext = this.getApplication();
+ //       mContext = this.getApplication();
         if(!isBound) {
             Intent intent = new Intent(this, PodcastService.class);
             startService(intent);

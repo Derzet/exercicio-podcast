@@ -17,7 +17,6 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
-
 /**
  * Created by gabri on 12/12/2017.
  */
@@ -37,9 +36,20 @@ public class ListPodcastTest {
     }
 
     @Test
-    public void testarElementoList() {
-        onData(hasToString(startsWith("Ciência e PseudoCiência")))
+    public void testarPrimeiroElementoList() {
+        onData(hasToString(startsWith("Ciência e Pseudociência")))
                 .inAdapterView(withId(R.id.items)).atPosition(0)
                 .perform(click());
     }
+ /*   @Test
+    public void testarDetailsElementoList(){
+        onData(hasToString(startsWith("Ciência e Pseudociência")))
+                .inAdapterView(withId(R.id.items)).atPosition(0)
+                .perform(click(longClick()));
+        onView(withId(R.id.link)).check(matches(withText("http://frontdaciencia.ufrgs.br/#1")));
+    }*/
+   /* @Test
+    public void clickEmBaixar(){
+        onData(hasToString(startsWith("Ciência e Pseudociência"))).onChildView(withId(R.id.item_action)).perform(click());
+    }*/
 }

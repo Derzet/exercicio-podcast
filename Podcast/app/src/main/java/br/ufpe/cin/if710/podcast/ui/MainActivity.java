@@ -4,6 +4,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.LifecycleRegistry;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
@@ -38,7 +40,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import br.ufpe.cin.if710.podcast.R;
@@ -50,25 +55,10 @@ import br.ufpe.cin.if710.podcast.services.PodcastService;
 import br.ufpe.cin.if710.podcast.ui.adapter.XmlFeedAdapter;
 
 
-public class MainActivity extends AppCompatActivity {
- /*   XmlFeedParser x = new XmlFeedParser();
-    TextView text;
-    Button b;
-    static Button ksad;
-    private static Activity var;
-    static Activity activity;
+public class MainActivity extends AppCompatActivity implements LifecycleOwner {
 
-    void setStaticActivity() {
-        activity = this;
-    }
-lixo para testar canaryleak*/
+    private LifecycleRegistry mLifecycleRegistry;
 
-
-
-
-    private static String testleak2 = SettingsActivity.FEED_LINK;
-
-    private LiveDataTeste mModel;
     //ao fazer envio da resolucao, use este link no seu codigo!
     private final String RSS_FEED = "http://leopoldomt.com/if710/fronteirasdaciencia.xml";
     private ContentResolver cr ; //adicionado o content
@@ -122,42 +112,28 @@ lixo para testar canaryleak*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mLifecycleRegistry = new LifecycleRegistry(this);
+        mLifecycleRegistry.markState(Lifecycle.State.CREATED);
+
         setTheme(R.style.Theme_AppCompat_Light_DarkActionBar);
         setContentView(R.layout.activity_main);
         cr = getContentResolver(); //instancia para a activity para comunicar com o provide
         // AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext()); referencia do db
 
-        mModel = ViewModelProviders.of(this).get(LiveDataTeste.class);
+        MyApplication.mModel = ViewModelProviders.of(this).get(LiveDataTeste.class);
 
-        subscribe(mModel);
-
-/*        LiveDataTeste.getData().observe(this, (Long time) -> {
-            ((TextView)findViewById(R.id.last_update)).setText(""+time);
-        });
-*/
-
-
-/*        final Observer<Long> nameObserver = new Observer<Long>() {
+        MyApplication.mModel.getElapsedTime().observe(this, new Observer<Long>() {
             @Override
             public void onChanged(@Nullable final Long newData) {
-                // Update the UI, in this case, a TextView.
-                ((TextView) findViewById(R.id.lastest_update)).setText("Ultima att feita em: "+newData);
-            }
-        };
-*/
-
-/*
-        mModel = ViewModelProviders.of(this).get(LiveDataTeste.class);
-        mModel.getData().observe(this, new Observer<Long>() {
-            @Override
-            public void onChanged(@Nullable final Long newData) {
-                // Update the UI, in this case, a TextView.
-                if (newData != null) {
-                    ((TextView) findViewById(R.id.lastest_update)).setText("Ultima att feita em: ");
-                }
+                Calendar c = Calendar.getInstance();
+                c.setTimeInMillis(newData);
+                Date d = (Date) c.getTime();
+                SimpleDateFormat format = new SimpleDateFormat("HH:mm - dd/MM/yy");
+                String time = format.format(d);
+                ((TextView) findViewById(R.id.lastest_update)).setText("Ultima att feita: " + time);
             }
         });
-*/
 
         items = (ListView) findViewById(R.id.items);
        // referencia minha aplicação
@@ -168,22 +144,6 @@ lixo para testar canaryleak*/
             bindService(intent, sConn, Context.BIND_AUTO_CREATE);
         }
 
-    }
-
-    private void subscribe(LiveDataTeste model) {
-        final Observer<Long> elapsedTimeObserver = new Observer<Long>() {
-            @Override
-            public void onChanged(@Nullable final Long aLong) {
-                ((TextView) findViewById(R.id.lastest_update)).setText(aLong.toString());
-                Log.d("ChronoActivity3", "Updating timer");
-            }
-        };
-        Log.d("TagF", "a");
-        if(model != null) {
-            Log.d("TagINN", mModel.getElapsedTime().getValue().toString());
-            Log.d("TagIn", "a");
-//            model.getElapsedTime().observe(this, elapsedTimeObserver);
-        }
     }
 
     @Override
@@ -210,7 +170,7 @@ lixo para testar canaryleak*/
         registerReceiver(receiver,filter );
         new DownloadXmlTask().execute(RSS_FEED);
 
-
+        mLifecycleRegistry.markState(Lifecycle.State.STARTED);
 
       //lixo para testar canary leak  setStaticActivity();
     }
@@ -224,7 +184,6 @@ lixo para testar canaryleak*/
 
 
     }
-
     private void showNotification(){
         //NOTIFICAÇÃO QUANDO ESTÁ EM BACKGROUND
         Context ctx = getApplicationContext();
@@ -244,11 +203,10 @@ lixo para testar canaryleak*/
         NotificationManager notificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(1, b.build());
     }
-
     @NonNull
     @Override
     public Lifecycle getLifecycle() {
-        return null;
+        return mLifecycleRegistry;
     }
 
 
@@ -289,6 +247,7 @@ lixo para testar canaryleak*/
         @Override
         protected void onPostExecute(List<ItemFeed> feed) {
             Toast.makeText(getApplicationContext(), "FINALIZANDO ATUALIZAÇÃO...", Toast.LENGTH_SHORT).show();
+
             //Cursor
             Cursor c = getContentResolver().query(PodcastProviderContract.EPISODE_LIST_URI,
                     PodcastProviderContract.ALL_COLUMNS,

@@ -33,6 +33,7 @@ public class LiveDataTeste extends AndroidViewModel {
         if(data == null){
             data = new MutableLiveData<>();
         }
+        data.setValue(new Date().getTime());
         return data;
     }
 }

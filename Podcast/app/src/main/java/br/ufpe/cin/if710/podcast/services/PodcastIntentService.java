@@ -25,6 +25,8 @@ import java.net.URL;
 import br.ufpe.cin.if710.podcast.db.PodcastProviderContract;
 import br.ufpe.cin.if710.podcast.domain.ItemFeed;
 
+import static java.lang.String.valueOf;
+
 
 /**
  * Created by Matheus on 08/10/2017.
@@ -87,7 +89,7 @@ public class PodcastIntentService extends IntentService {
             }
 
 
-
+            Log.d("Prov", item.getTitle());
             ContentValues content = new ContentValues();
 
             //modificar o objeto
@@ -102,10 +104,10 @@ public class PodcastIntentService extends IntentService {
             Log.i("PodcastIntentService", "FINISH DOWNLOAD");
 
 
-            int idN = Integer.parseInt(id) + 1;
+            int idN = Integer.parseInt(id)+1;
             cr.update(PodcastProviderContract.EPISODE_LIST_URI,
                     content,
-                    idN + "",
+                    valueOf(idN),
                     null
             );
 
